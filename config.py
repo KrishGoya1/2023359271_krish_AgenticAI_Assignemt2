@@ -6,8 +6,14 @@ Shared constants: model name, layout width, LLM persona,
 and the full REPORT_SECTIONS definition.
 """
 
-# ── Model ─────────────────────────────────────────────────────
-MODEL_NAME = "microsoft/phi-2"
+# ── OpenRouter API ────────────────────────────────────────────
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+# Default model — any OpenRouter model slug works here, e.g.:
+#   "meta-llama/llama-3-8b-instruct"   (free tier)
+#   "mistralai/mistral-7b-instruct"     (free tier)
+#   "openai/gpt-4o-mini"                (cheap + fast)
+OPENROUTER_MODEL = "meta-llama/llama-3-8b-instruct:free"
 
 # ── Layout ────────────────────────────────────────────────────
 WIDTH = 65          # character width used across cover page + section formatter

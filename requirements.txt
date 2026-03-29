@@ -1,9 +1,7 @@
 langchain
 langchain-community
-langchain-huggingface
-transformers
-accelerate
+langchain-openai
+openai
 ddgs
 wikipedia
-huggingface_hub
-torch
+python-dotenv

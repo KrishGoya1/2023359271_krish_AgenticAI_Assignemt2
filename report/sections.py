@@ -38,8 +38,12 @@ def generate_section(
     prompt = build_prompt(topic, instruction, context)
 
     try:
-        raw      = llm.invoke(prompt)
-        response = clean_response(str(raw))
+        raw = llm.invoke(prompt)
+
+        # ChatOpenAI (OpenRouter) returns an AIMessage; HuggingFacePipeline
+        # returns a plain string. Handle both gracefully.
+        raw_text = raw.content if hasattr(raw, "content") else str(raw)
+        response = clean_response(raw_text)
 
         if len(response.strip()) < 60:
             print(f"    ⚠️  Section {section_num} output too short — using fallback.")

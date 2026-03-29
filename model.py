@@ -1,67 +1,67 @@
 # -*- coding: utf-8 -*-
 """
-model.py
-========
-Lazy Phi-2 model loader.
+model.py  (openrouter branch)
+==============================
+Returns a LangChain ChatOpenAI client pointed at OpenRouter.
 
-Call `load_model()` to get a ready-to-use HuggingFacePipeline (`llm`).
-Nothing runs on import — the expensive GPU/CPU work happens only when
-explicitly requested.
+No GPU, no 5 GB download — just an API key.
+
+Usage:
+    from model import load_model
+    llm = load_model()          # reads OPENROUTER_API_KEY from .env
+    llm = load_model(model="openai/gpt-4o-mini")   # override model
 """
 
-import torch
-from transformers import AutoConfig, AutoTokenizer, AutoModelForCausalLM, pipeline
-from langchain_huggingface import HuggingFacePipeline
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 
-from config import MODEL_NAME
+from config import OPENROUTER_BASE_URL, OPENROUTER_MODEL
 
 
-def load_model() -> HuggingFacePipeline:
+def load_model(model: str | None = None) -> ChatOpenAI:
     """
-    Load the Phi-2 model and return a LangChain-compatible HuggingFacePipeline.
+    Build a ChatOpenAI client configured for the OpenRouter API.
 
-    Device is selected automatically:
-      - CUDA if a GPU is available
-      - CPU otherwise (uses float32 to avoid half-precision issues)
+    API key is read from the OPENROUTER_API_KEY environment variable
+    (or from a .env file in the project root).
+
+    Args:
+        model: Optional OpenRouter model slug to override the default
+               set in config.py (OPENROUTER_MODEL).
 
     Returns:
-        llm (HuggingFacePipeline): Ready-to-invoke LLM wrapper.
+        A LangChain ChatOpenAI instance ready to invoke.
+
+    Raises:
+        EnvironmentError: If OPENROUTER_API_KEY is not set.
     """
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"🖥️  Running on: {device.upper()}")
+    load_dotenv()   # load .env if present
 
-    print("⚙️  Loading config...")
-    config = AutoConfig.from_pretrained(MODEL_NAME, trust_remote_code=True)
-    config.pad_token_id = 50256
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise EnvironmentError(
+            "OPENROUTER_API_KEY is not set.\n"
+            "Create a .env file with:\n"
+            "  OPENROUTER_API_KEY=sk-or-...\n"
+            "Or export it in your shell before running."
+        )
 
-    print("⏳ Loading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
-    tokenizer.pad_token    = tokenizer.eos_token
-    tokenizer.pad_token_id = 50256
+    chosen_model = model or OPENROUTER_MODEL
+    print(f"🤖 Using OpenRouter model: {chosen_model}")
 
-    print("⏳ Loading model...")
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME,
-        config      = config,
-        torch_dtype = torch.float16 if device == "cuda" else torch.float32,
-        device_map  = "auto",
-        trust_remote_code = True,
+    llm = ChatOpenAI(
+        model           = chosen_model,
+        openai_api_key  = api_key,
+        openai_api_base = OPENROUTER_BASE_URL,
+        temperature     = 0.7,
+        max_tokens      = 1000,
+        # OpenRouter-specific headers for leaderboard attribution (optional)
+        default_headers = {
+            "HTTP-Referer": "https://github.com/KrishGoya1/2023359271_krish_AgenticAI_Assignemt2",
+            "X-Title"     : "ReAct Research Agent",
+        },
     )
 
-    print("⚙️  Building pipeline...")
-    hf_pipeline = pipeline(
-        "text-generation",
-        model              = model,
-        tokenizer          = tokenizer,
-        max_new_tokens     = 1000,
-        temperature        = 0.7,
-        do_sample          = True,
-        repetition_penalty = 1.2,
-        return_full_text   = False,
-        pad_token_id       = 50256,
-        truncation         = True,
-    )
-
-    llm = HuggingFacePipeline(pipeline=hf_pipeline)
-    print("✅ Phi-2 ready\n")
+    print("✅ OpenRouter client ready\n")
     return llm

@@ -54,10 +54,17 @@ Date : {datetime.now().strftime("%B %d, %Y")}
 
 def save_report(topic: str, text: str) -> None:
     """
-    Write the final report to a plain-text file named after the topic.
-    The file is saved in the current working directory.
+    Write the final report to:
+        outputs/{Topic_Name}/{Topic_Name}.txt
+
+    The topic folder is created automatically if it doesn't exist.
     """
-    filename = topic.replace(" ", "_") + ".txt"
-    with open(filename, "w", encoding="utf-8") as f:
+    import os
+    folder_name = topic.replace(" ", "_")
+    output_dir  = os.path.join("outputs", folder_name)
+    os.makedirs(output_dir, exist_ok=True)
+
+    filepath = os.path.join(output_dir, folder_name + ".txt")
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(format_text_block(text))
-    print(f"💾 Saved: {filename}")
+    print(f"💾 Saved: {filepath}")
