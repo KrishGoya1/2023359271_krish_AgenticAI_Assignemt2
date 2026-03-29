@@ -112,8 +112,8 @@ def format_section(number: int, title: str, content: str) -> str:
         if wrapped:
             formatted_lines.append(wrapped)
 
-    # Per-section line caps to prevent runaway output
-    MAX_LINES = {1: 8, 2: 12, 3: 12, 4: 8, 5: 8}
+    # Per-section line caps — generous enough for quality content
+    MAX_LINES = {1: 20, 2: 25, 3: 20, 4: 20, 5: 20}
     limit = MAX_LINES.get(number, 12)
 
     if len(formatted_lines) > limit:
