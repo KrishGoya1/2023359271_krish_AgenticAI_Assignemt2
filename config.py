@@ -13,7 +13,7 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #   "meta-llama/llama-3-8b-instruct"   (free tier)
 #   "mistralai/mistral-7b-instruct"     (free tier)
 #   "openai/gpt-4o-mini"                (cheap + fast)
-OPENROUTER_MODEL = "meta-llama/llama-3-8b-instruct:free"
+OPENROUTER_MODEL = "openrouter/free"
 
 # ── Layout ────────────────────────────────────────────────────
 WIDTH = 65          # character width used across cover page + section formatter
