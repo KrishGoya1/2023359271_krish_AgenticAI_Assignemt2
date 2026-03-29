@@ -225,4 +225,4 @@ openai, python-dotenv, ddgs, wikipedia
 
 ## 📄 License
 
-This project is submitted as academic coursework. All generated report content is AI-produced and intended for educational purposes only.
+This project is submitted as academic coursework. All generated report content intended for educational purposes only.
